@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>🥗 智能每周菜单 · 均衡食单</title>
+  <!-- Font Awesome 6 图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(165deg, #f2f8f0 0%, #e7f0e9 100%);
+      min-height: 100vh;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-app {
+      max-width: 1600px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 3.5rem 3.5rem 2.5rem 2.5rem;
+      box-shadow: 0 30px 60px -20px rgba(30, 70, 50, 0.4), inset 0 1px 2px #fff9;
+      padding: 2.2rem 2rem 2.2rem;
+      border: 1px solid rgba(180, 210, 180, 0.5);
+    }
+
+    /* 头部区域 */
+    .app-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .title-section {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .title-section i {
+      font-size: 2.5rem;
+      color: #2b7342;
+      filter: drop-shadow(0 4px 6px #b6d7c2);
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 620;
+      background: linear-gradient(130deg, #1f4d31, #3d8b5c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .config-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem 1.5rem;
+      background: white;
+      padding: 0.5rem 1.5rem 0.5rem 1.2rem;
+      border-radius: 60px;
+      box-shadow: 0 10px 20px -10px #2f5a4470;
+      border: 1px solid #bfe0cd;
+    }
+
+    .people-counter {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .people-counter label {
+      font-weight: 550;
+      color: #1f4d31;
+      font-size: 1.1rem;
+    }
+
+    .people-counter input {
+      width: 70px;
+      padding: 0.5rem 0.5rem;
+      border: 2px solid #cbe5d6;
+      border-radius: 40px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #1c4a2e;
+      outline: none;
+      background: #f6fef9;
+    }
+
+    .people-counter input:focus {
+      border-color: #469d6e;
+      box-shadow: 0 0 0 3px #c1efd4;
+    }
+
+    .week-nav {
+      display: flex;
+      align-items: center;
+      background: #ffffffd0;
+      border-radius: 60px;
+      padding: 0.3rem;
+      border: 1px solid #bcddcc;
+    }
+
+    .week-nav button {
+      width: 2.8rem;
+      height: 2.8rem;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      font-size: 1.4rem;
+      color: #286b41;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .week-nav button:hover {
+      background: #daf1e3;
+    }
+
+    .week-range {
+      font-weight: 550;
+      padding: 0 1.2rem;
+      font-size: 1.1rem;
+      color: #1b4b31;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .btn {
+      background: white;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 8px 16px -10px #27633e;
+      cursor: pointer;
+      transition: 0.15s;
+      border: 1px solid #b1d9c1;
+      color: #1f5a37;
+    }
+
+    .btn i { color: #388e5c; }
+    .btn:hover {
+      background: #edfff5;
+      border-color: #71b38c;
+      transform: scale(1.02) translateY(-2px);
+    }
+
+    /* 菜单网格 */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1.2rem;
+      margin: 2rem 0 1rem;
+    }
+
+    .day-card {
+      background: white;
+      border-radius: 28px;
+      padding: 1.5rem 1rem 1.5rem;
+      box-shadow: 0 20px 35px -16px #2d5b4270;
+      border: 1px solid #e2f0e8;
+      transition: 0.2s;
+    }
+
+    .day-card:hover {
+      transform: translateY(-4px);
+      border-color: #abd6be;
+    }
+
+    .card-header {
+      border-bottom: 2px dashed #cbe3d6;
+      padding-bottom: 0.7rem;
+      margin-bottom: 1rem;
+    }
+
+    .day-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1b5535;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .day-date {
+      font-size: 0.9rem;
+      color: #678e7a;
+    }
+
+    /* 每顿饭区块 */
+    .meal-block {
+      margin-bottom: 1.4rem;
+    }
+
+    .meal-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #54856b;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-bottom: 0.5rem;
+      border-left: 5px solid #b0dcc0;
+      padding-left: 0.5rem;
+    }
+
+    .dish-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.3rem 0.2rem 0.3rem 0.5rem;
+      background: #f9fffc;
+      border-radius: 30px;
+      margin-bottom: 0.3rem;
+      border: 1px solid #e2f0e6;
+    }
+
+    .dish-name {
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .dish-name i {
+      font-size: 0.8rem;
+      color: #cc7f3a;
+    }
+
+    .meat-icon { color: #b95252 !important; }
+    .veg-icon { color: #51a851 !important; }
+
+    .swap-btn {
+      background: transparent;
+      border: none;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      color: #4f8e6c;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .swap-btn:hover {
+      background: #def3e7;
+      color: #25643b;
+    }
+
+    .staple-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.3rem;
+      padding: 0.3rem 0.5rem;
+      background: #f1f9f3;
+      border-radius: 30px;
+      font-size: 0.95rem;
+    }
+
+    .staple-name i { color: #c09b4b; margin-right: 0.3rem; }
+
+    .add-dish-btn {
+      width: 100%;
+      margin-top: 0.6rem;
+      background: #effcf5;
+      border: 1px dashed #86ba9b;
+      border-radius: 40px;
+      padding: 0.4rem;
+      color: #2d7a4f;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .add-dish-btn:hover {
+      background: #daf5e6;
+      border: 1px solid #5baa7c;
+    }
+
+    /* 早餐特殊布局 */
+    .breakfast-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .footer-note {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #739e87;
+      border-top: 1px dashed #c0ddce;
+      padding-top: 1.5rem;
+    }
+
+    @media (max-width: 1100px) {
+      .menu-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 800px) {
+      .menu-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="menu-app">
+  <div class="app-header">
+    <div class="title-section">
+      <i class="fas fa-seedling"></i>
+      <h1>均衡食单·每周计划</h1>
+    </div>
+
+    <div class="config-panel">
+      <div class="people-counter">
+        <label><i class="fas fa-users"></i> 人数</label>
+        <input type="number" id="peopleInput" min="1" max="8" value="3" step="1">
+      </div>
+      <div class="week-nav">
+        <button id="prevWeekBtn"><i class="fas fa-chevron-left"></i></button>
+        <span class="week-range" id="weekRange"></span>
+        <button id="nextWeekBtn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn" id="randomAllBtn"><i class="fas fa-dice"></i> 全新菜单</button>
+      <button class="btn" id="todayBtn"><i class="fas fa-calendar-check"></i> 本周</button>
+    </div>
+  </div>
+
+  <div class="menu-grid" id="menuGrid"></div>
+
+  <div class="footer-note">
+    <span><i class="fas fa-utensils"></i> 早餐·午餐·晚餐  |  </span>
+    <span><i class="fas fa-dragon"></i> 荤(含海鲜)  <i class="fas fa-leaf veg-icon"></i> 素  |  </span>
+    <span><i class="fas fa-arrows-rotate"></i> 点击小图标换菜  |  </span>
+    <span><i class="fas fa-plus-circle"></i> 加菜自动平衡营养</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ---------- 菜品库（中文，分类）----------
+  const meatDishes = [  // 荤菜+海鲜
+    "🐔 宫保鸡丁", "🥩 黑椒牛柳", "🐟 清蒸鲈鱼", "🍖 蜜汁烤鸡翅", "🦐 蒜蓉粉丝虾",
+    "🍗 照烧鸡腿", "🐷 糖醋排骨", "🐑 孜然羊肉", "🦀 葱姜炒蟹", "🐙 酱爆鱿鱼",
+    "🐮 番茄牛腩煲", "🍗 脆皮烧鸭", "🐟 酸菜鱼", "🍤 油焖大虾", "🐷 红烧肉",
+    "🥘 咖喱牛肉", "🦆 啤酒鸭", "🐚 辣炒花蛤", "🐔 口水鸡", "🍗 烤羊排",
+    "🐟 剁椒鱼头", "🦐 白灼虾", "🐷 梅菜扣肉", "🐮 罗宋汤"
+  ];
+  const vegDishes = [
+    "🥬 蒜蓉时蔬", "🍆 鱼香茄子", "🥒 拍黄瓜", "🌽 松仁玉米", "🥦 清炒西兰花",
+    "🍅 番茄炒蛋", "🥔 酸辣土豆丝", "🥕 胡萝卜炒蛋", "🍄 蚝油杏鲍菇", "🥗 蔬菜沙拉",
+    "🌶️ 虎皮青椒", "🧄 蒜蓉秋葵", "🥢 地三鲜", "🍲 白菜炖豆腐", "🥬 腐乳通菜",
+    "🍠 拔丝地瓜", "🧅 洋葱炒蛋", "🥙 干锅花菜", "🍘 莲藕盒子(素)", "🥟 韭菜炒豆芽"
+  ];
+  const breakfastStaple = [ "🥣 燕麦粥", "🍳 煎蛋吐司", "🥟 蒸饺", "🍚 皮蛋瘦肉粥", "🥐 牛角包", "🍠 烤红薯", "🌽 蒸玉米", "🍜 鸡汤面", "🥞 松饼", "🍘 饭团" ];
+  const breakfastDrink = [ "🥛 牛奶", "☕ 豆浆", "🍵 绿茶", "🧃 橙汁", "☕ 咖啡", "🥛 酸奶", "🍶 米糊" ];
+  const breakfastExtra = [ "🍎 苹果", "🍌 香蕉", "🥚 水煮蛋", "🥗 蔬菜沙拉", "🧀 芝士片", "🍊 橙子", "🍳 煎蛋" ];
+  const stapleFoods = [ "🍚 米饭", "🍜 面条", "🍲 粥", "🫓 饼", "🥟 饺子", "🍞 包子", "🌮 卷饼", "🍛 杂粮饭", "🍝 意面", "🍚 糙米饭" ];
+
+  // 辅助函数：随机取一项，并可指定排除项
+  function randomFromArray(arr, excludeItems = []) {
+    if (!arr.length) return '—';
+    let filtered = arr.filter(item => !excludeItems.includes(item));
+    if (filtered.length === 0) filtered = arr; // 如果全排除则允许重复
+    return filtered[Math.floor(Math.random() * filtered.length)];
+  }
+
+  // 获取本周周一日期
+  function getMonday(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = (day === 0) ? 6 : (day - 1);
+    d.setDate(d.getDate() - diff);
+    return d;
+  }
+
+  // ---------- 全局状态 ----------
+  let people = 3;                 // 人数
+  let displayMonday = getMonday(new Date());
+  let weekMenu = [];              // 长度为7的数组，每天 { breakfast:{staple,drink,extra}, lunch:{dishes:[{name,type}], staple}, dinner:同 }
+
+  // DOM 元素
+  const peopleInput = document.getElementById('peopleInput');
+  const weekRangeEl = document.getElementById('weekRange');
+  const menuGridEl = document.getElementById('menuGrid');
+  const prevBtn = document.getElementById('prevWeekBtn');
+  const nextBtn = document.getElementById('nextWeekBtn');
+  const randomAllBtn = document.getElementById('randomAllBtn');
+  const todayBtn = document.getElementById('todayBtn');
+
+  // 计算该餐应有多少道菜
+  function getDishCount() {
+    return people + 1;
+  }
+
+  // 根据总道数计算目标荤菜数：荤菜 = floor(总道数/2) + 1
+  function targetMeatCount(totalDishes) {
+    return Math.floor(totalDishes / 2) + 1;
+  }
+
+  // 生成一周全新菜单 (根据人数)
+  function generateWeekMenu() {
+    const dishCount = getDishCount();          // 每餐菜品数
+    const targetMeat = targetMeatCount(dishCount);
+    const targetVeg = dishCount - targetMeat;
+
+    // 用于记录本周已使用的菜品（避免重复），只记录午餐晚餐的菜名，早餐和主食暂不强制去重（但可简单处理）
+    let usedDishes = new Set();
+
+    const week = [];
+    for (let day = 0; day < 7; day++) {
+      // 早餐 (随机，暂不加入去重)
+      const breakfast = {
+        staple: randomFromArray(breakfastStaple),
+        drink: randomFromArray(breakfastDrink),
+        extra: randomFromArray(breakfastExtra)
+      };
+
+      // 午餐菜品
+      const lunchDishes = [];
+      const meatPool = [...meatDishes];
+      const vegPool = [...vegDishes];
+      // 选荤菜
+      for (let i = 0; i < targetMeat; i++) {
+        let candidate = randomFromArray(meatPool, Array.from(usedDishes));
+        usedDishes.add(candidate);
+        lunchDishes.push({ name: candidate, type: 'meat' });
+      }
+      // 选素菜
+      for (let i = 0; i < targetVeg; i++) {
+        let candidate = randomFromArray(vegPool, Array.from(usedDishes));
+        usedDishes.add(candidate);
+        lunchDishes.push({ name: candidate, type: 'veg' });
+      }
+      // 打乱顺序
+      lunchDishes.sort(() => Math.random() - 0.5);
+
+      // 午餐主食
+      const lunchStaple = randomFromArray(stapleFoods);
+
+      // 晚餐 (同理)
+      const dinnerDishes = [];
+      for (let i = 0; i < targetMeat; i++) {
+        let candidate = randomFromArray(meatPool, Array.from(usedDishes));
+        usedDishes.add(candidate);
+        dinnerDishes.push({ name: candidate, type: 'meat' });
+      }
+      for (let i = 0; i < targetVeg; i++) {
+        let candidate = randomFromArray(vegPool, Array.from(usedDishes));
+        usedDishes.add(candidate);
+        dinnerDishes.push({ name: candidate, type: 'veg' });
+      }
+      dinnerDishes.sort(() => Math.random() - 0.5);
+      const dinnerStaple = randomFromArray(stapleFoods);
+
+      week.push({
+        breakfast,
+        lunch: { dishes: lunchDishes, staple: lunchStaple },
+        dinner: { dishes: dinnerDishes, staple: dinnerStaple }
+      });
+    }
+    return week;
+  }
+
+  // 重新生成并渲染（保留当前周）
+  function refreshWeek(keepMonday = true) {
+    weekMenu = generateWeekMenu();
+    render();
+  }
+
+  // 渲染周范围和卡片
+  function render() {
+    // 周范围
+    const monday = new Date(displayMonday);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const y1 = monday.getFullYear(), m1 = monday.getMonth()+1, d1 = monday.getDate();
+    const y2 = sunday.getFullYear(), m2 = sunday.getMonth()+1, d2 = sunday.getDate();
+    let rangeText = (y1 === y2) ? `${y1}年 ${m1}月${d1}日 - ${m2}月${d2}日` : `${y1}年${m1}月${d1}日 - ${y2}年${m2}月${d2}日`;
+    weekRangeEl.textContent = rangeText;
+
+    // 生成卡片HTML
+    const dayNames = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+      const dayData = weekMenu[i];
+      if (!dayData) continue;
+      const currentDate = new Date(monday);
+      currentDate.setDate(monday.getDate() + i);
+      const dateLabel = `${currentDate.getMonth()+1}/${currentDate.getDate()}`;
+
+      // 早餐
+      const bf = dayData.breakfast;
+      // 午餐
+      const lunch = dayData.lunch;
+      const lunchDishesHtml = lunch.dishes.map((dish, idx) => `
+        <div class="dish-item" data-day="${i}" data-meal="lunch" data-index="${idx}">
+          <span class="dish-name"><i class="fas ${dish.type === 'meat' ? 'fa-drumstick-bite meat-icon' : 'fa-leaf veg-icon'}"></i> ${dish.name}</span>
+          <button class="swap-btn" data-swap="dish"><i class="fas fa-rotate-right"></i></button>
+        </div>
+      `).join('');
+      // 晚餐
+      const dinner = dayData.dinner;
+      const dinnerDishesHtml = dinner.dishes.map((dish, idx) => `
+        <div class="dish-item" data-day="${i}" data-meal="dinner" data-index="${idx}">
+          <span class="dish-name"><i class="fas ${dish.type === 'meat' ? 'fa-drumstick-bite meat-icon' : 'fa-leaf veg-icon'}"></i> ${dish.name}</span>
+          <button class="swap-btn" data-swap="dish"><i class="fas fa-rotate-right"></i></button>
+        </div>
+      `).join('');
+
+      html += `
+        <div class="day-card">
+          <div class="card-header">
+            <span class="day-name"><i class="fas fa-calendar-alt"></i>${dayNames[i]}</span>
+            <span class="day-date">${dateLabel}</span>
+          </div>
+          <!-- 早餐 -->
+          <div class="meal-block">
+            <div class="meal-title"><i class="fas fa-sun"></i> 早餐</div>
+            <div class="breakfast-items">
+              <div class="dish-item" data-day="${i}" data-meal="bf-staple"><span class="dish-name"><i class="fas fa-bread-slice"></i> ${bf.staple}</span><button class="swap-btn" data-swap="bfStaple"><i class="fas fa-rotate-right"></i></button></div>
+              <div class="dish-item" data-day="${i}" data-meal="bf-drink"><span class="dish-name"><i class="fas fa-mug-hot"></i> ${bf.drink}</span><button class="swap-btn" data-swap="bfDrink"><i class="fas fa-rotate-right"></i></button></div>
+              <div class="dish-item" data-day="${i}" data-meal="bf-extra"><span class="dish-name"><i class="fas fa-apple-alt"></i> ${bf.extra}</span><button class="swap-btn" data-swap="bfExtra"><i class="fas fa-rotate-right"></i></button></div>
+            </div>
+          </div>
+          <!-- 午餐 -->
+          <div class="meal-block">
+            <div class="meal-title"><i class="fas fa-cloud-sun"></i> 午餐 · ${lunch.dishes.length}道</div>
+            ${lunchDishesHtml}
+            <div class="staple-row" data-day="${i}" data-meal="lunch-staple">
+              <span class="staple-name"><i class="fas fa-utensil-spoon"></i> 主食: ${lunch.staple}</span>
+              <button class="swap-btn" data-swap="lunchStaple"><i class="fas fa-rotate-right"></i></button>
+            </div>
+            <div class="add-dish-btn" data-day="${i}" data-meal="lunch"><i class="fas fa-plus-circle"></i> 加一道菜</div>
+          </div>
+          <!-- 晚餐 -->
+          <div class="meal-block">
+            <div class="meal-title"><i class="fas fa-moon"></i> 晚餐 · ${dinner.dishes.length}道</div>
+            ${dinnerDishesHtml}
+            <div class="staple-row" data-day="${i}" data-meal="dinner-staple">
+              <span class="staple-name"><i class="fas fa-utensil-spoon"></i> 主食: ${dinner.staple}</span>
+              <button class="swap-btn" data-swap="dinnerStaple"><i class="fas fa-rotate-right"></i></button>
+            </div>
+            <div class="add-dish-btn" data-day="${i}" data-meal="dinner"><i class="fas fa-plus-circle"></i> 加一道菜</div>
+          </div>
+        </div>
+      `;
+    }
+    menuGridEl.innerHTML = html;
+  }
+
+  // 换菜逻辑
+  function handleSwap(day, meal, indexOrType) {
+    const dayData = weekMenu[day];
+    const usedSet = new Set();
+    weekMenu.forEach(d => {
+      d.lunch.dishes.forEach(dd => usedSet.add(dd.name));
+      d.dinner.dishes.forEach(dd => usedSet.add(dd.name));
+    });
+
+    if (meal === 'bfStaple') {
+      dayData.breakfast.staple = randomFromArray(breakfastStaple, [dayData.breakfast.staple]);
+    } else if (meal === 'bfDrink') {
+      dayData.breakfast.drink = randomFromArray(breakfastDrink, [dayData.breakfast.drink]);
+    } else if (meal === 'bfExtra') {
+      dayData.breakfast.extra = randomFromArray(breakfastExtra, [dayData.breakfast.extra]);
+    } else if (meal === 'lunchStaple') {
+      dayData.lunch.staple = randomFromArray(stapleFoods, [dayData.lunch.staple]);
+    } else if (meal === 'dinnerStaple') {
+      dayData.dinner.staple = randomFromArray(stapleFoods, [dayData.dinner.staple]);
+    } else if (meal === 'lunch' && typeof indexOrType === 'number') {
+      const dish = dayData.lunch.dishes[indexOrType];
+      const pool = dish.type === 'meat' ? meatDishes : vegDishes;
+      const newName = randomFromArray(pool, [dish.name, ...Array.from(usedSet)]);
+      dish.name = newName;
+    } else if (meal === 'dinner' && typeof indexOrType === 'number') {
+      const dish = dayData.dinner.dishes[indexOrType];
+      const pool = dish.type === 'meat' ? meatDishes : vegDishes;
+      const newName = randomFromArray(pool, [dish.name, ...Array.from(usedSet)]);
+      dish.name = newName;
+    }
+    render();
+  }
+
+  // 加菜
+  function addDish(day, mealType) {
+    const dayData = weekMenu[day];
+    const targetMeal = mealType === 'lunch' ? dayData.lunch : dayData.dinner;
+    const dishCount = targetMeal.dishes.length + 1;
+    const targetMeat = targetMeatCount(dishCount); // 新目标荤菜数
+    const currentMeat = targetMeal.dishes.filter(d => d.type === 'meat').length;
+    // 决定新菜类型
+    let newType = 'veg';
+    if (currentMeat < targetMeat) newType = 'meat';
+    else if (currentMeat > targetMeat) newType = 'veg'; // 基本不会，但保留
+    else newType = Math.random() < 0.5 ? 'meat' : 'veg'; // 相等时随机
+
+    const pool = newType === 'meat' ? meatDishes : vegDishes;
+    // 收集本周已用菜品
+    const used = new Set();
+    weekMenu.forEach(d => {
+      d.lunch.dishes.forEach(dd => used.add(dd.name));
+      d.dinner.dishes.forEach(dd => used.add(dd.name));
+    });
+    const newName = randomFromArray(pool, Array.from(used));
+    targetMeal.dishes.push({ name: newName, type: newType });
+
+    // 重新平衡一下（简单处理：若荤菜数仍不符，则随机改一道菜的类型？但为了不搞复杂，先保证加菜合理）
+    render();
+  }
+
+  // 事件绑定（委托）
+  menuGridEl.addEventListener('click', (e) => {
+    const swapBtn = e.target.closest('.swap-btn');
+    const addBtn = e.target.closest('.add-dish-btn');
+    if (swapBtn) {
+      const dishItem = swapBtn.closest('[data-day]');
+      if (!dishItem) return;
+      const day = parseInt(dishItem.dataset.day);
+      const meal = dishItem.dataset.meal; // 可能是 'lunch' / 'dinner' / 'bf-staple' 等
+      if (meal === 'lunch' || meal === 'dinner') {
+        // 菜品换
+        const index = dishItem.dataset.index;
+        if (index !== undefined) handleSwap(day, meal, parseInt(index));
+      } else {
+        // 早餐或主食换
+        handleSwap(day, meal);
+      }
+    } else if (addBtn) {
+      const day = parseInt(addBtn.dataset.day);
+      const meal = addBtn.dataset.meal; // 'lunch' or 'dinner'
+      addDish(day, meal);
+    }
+  });
+
+  // 人数变化
+  peopleInput.addEventListener('input', (e) => {
+    let val = parseInt(e.target.value);
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > 8) val = 8;
+    people = val;
+    peopleInput.value = val;
+    refreshWeek();
+  });
+
+  // 周切换
+  prevBtn.addEventListener('click', () => {
+    displayMonday.setDate(displayMonday.getDate() - 7);
+    refreshWeek();
+  });
+  nextBtn.addEventListener('click', () => {
+    displayMonday.setDate(displayMonday.getDate() + 7);
+    refreshWeek();
+  });
+  todayBtn.addEventListener('click', () => {
+    displayMonday = getMonday(new Date());
+    refreshWeek();
+  });
+  randomAllBtn.addEventListener('click', () => refreshWeek());
+
+  // 初始化
+  weekMenu = generateWeekMenu();
+  render();
+})();
+</script>
+</body>
+</html>
